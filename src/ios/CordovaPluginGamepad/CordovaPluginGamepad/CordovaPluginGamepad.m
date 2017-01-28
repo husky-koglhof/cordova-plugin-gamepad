@@ -128,7 +128,7 @@
                     // Negate the value as the W3C considers up as negative 1 (-1)
                     axes[AXIS_RIGHT_JOYSTICK_Y_INDEX] = [NSNumber numberWithFloat:-data.rightThumbstick.yAxis.value];
                 }
-                
+
                 [gamepad setObject:[NSNumber numberWithInteger:CACurrentMediaTime() * 1000.0 - initialTimeMillis] forKey:TIME_STAMP];
             }
         };
@@ -173,7 +173,7 @@
                     buttons[BUTTON_DPAD_LEFT_INDEX] = [NSNumber numberWithFloat:data.dpad.left.value];
                     buttons[BUTTON_DPAD_RIGHT_INDEX] = [NSNumber numberWithFloat:data.dpad.right.value];
                 }
-                
+
                 [gamepad setObject:[NSNumber numberWithInteger:CACurrentMediaTime() * 1000.0 - initialTimeMillis] forKey:TIME_STAMP];
             }
         };
@@ -198,7 +198,7 @@
         axes[i] = [NSNumber numberWithDouble:0.0];
     }
     NSMutableDictionary* gamepad = [[NSMutableDictionary alloc] init];
-    
+
     // Get the player index from the controller. If it hasn't been set yet, assign it the last value from the gamepads array.
     NSInteger playerIndex = controller.playerIndex;
     if (playerIndex == GCControllerPlayerIndexUnset || [self findGamepadByPlayerIndex:playerIndex])
@@ -207,7 +207,7 @@
         // Remember to assign the player index to the controller.
         controller.playerIndex = playerIndex;
     }
-    
+
     // Assign the basic values.
     [gamepad setObject:controller.vendorName forKey:ID];
     [gamepad setObject:[NSNumber numberWithInteger:playerIndex] forKey:INDEX];
@@ -216,26 +216,26 @@
     [gamepad setObject:@"standard" forKey:MAPPING];
     [gamepad setObject:buttons forKey:BUTTONS];
     [gamepad setObject:axes forKey:AXES];
-    
+
     [self setupControllerToBeRead:controller];
-    
+
     // Can release the button and axis arrays as the ownership is in the NSDictionary now.
     [buttons release];
     buttons = nil;
     [axes release];
     axes = nil;
-    
+
     controller.controllerPausedHandler = ^(GCController* controller)
     {
     };
-    
+
     return gamepad;
 }
 
 -(void)createGamepads
 {
     [self->gamepads removeAllObjects];
-    
+
     NSArray* controllers = [GCController controllers];
     for (NSInteger i = 0; i < controllers.count; i++)
     {
@@ -258,9 +258,9 @@
         NSInteger playerIndex = [(NSNumber*)[gamepad objectForKey:INDEX] integerValue];
         gamepad = controller.playerIndex == playerIndex ? gamepad : nil;
     }
-    
+
     bool found = gamepad != nil;
-    
+
     if (!found)
     {
         // Create a gamepad from the controller
@@ -268,15 +268,15 @@
         // Add it to the array of gamepads
         [self->gamepads addObject:gamepad];
     }
-    
+
     // Set the gamepad to be notified in the event
     [argument setObject:gamepad forKey:GAMEPAD];
-    
+
     CDVPluginResult* pluginResult = nil;
     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:argument];
     [pluginResult setKeepCallbackAsBool:true];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:gamepadConnectedCommand.callbackId];
-    
+
     if (!found)
     {
         // Release the gamepad as the reference is retained in the gamepads container.
@@ -297,7 +297,7 @@
         NSInteger playerIndex = [(NSNumber*)[gamepad objectForKey:INDEX] integerValue];
         gamepad = controller.playerIndex == playerIndex ? gamepad : nil;
     }
-    
+
     // Remove the gamepad from the array of gamepads
     if (gamepad)
     {
@@ -306,26 +306,15 @@
         [self->gamepads removeObjectAtIndex:i-1];
         // Set the gamepad to be notified in the event.
         [argument setObject:gamepad forKey:GAMEPAD];
-        
+
         CDVPluginResult* pluginResult = nil;
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:argument];
         [pluginResult setKeepCallbackAsBool:true];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:gamepadDisconnectedCommand.callbackId];
-        
+
         [gamepad release];
         gamepad = nil;
     }
-}
-
--(id)initWithWebView:(UIWebView*)theWebView
-{
-    self = [super initWithWebView:theWebView];
-    if (self)
-    {
-        self->gamepads = [[NSMutableArray alloc] init];
-        self->argument = [[NSMutableDictionary alloc] init];
-    }
-    return self;
 }
 
 -(void)dealloc
@@ -345,7 +334,7 @@
         [gamepadDisconnectedCommand release];
         gamepadDisconnectedCommand = nil;
     }
-    
+
     if (gamepadDisconnectedCommand)
     {
         [gamepadDisconnectedCommand release];
@@ -358,14 +347,17 @@
 {
     // This check allows iOS backwark compatibility. In devices with iOS version < 7.0, it will look like if the gamepad API did not even exist.
     if (![GCController class]) return;
-    
+
+    self->gamepads = [[NSMutableArray alloc] init];
+    self->argument = [[NSMutableDictionary alloc] init];
+
     [self createGamepads];
-    
+
     // Register for game controller connection/disconnection notifications
     NSNotificationCenter* center = [NSNotificationCenter defaultCenter];
     [center addObserver:self selector:@selector(controllerDidConnect:) name:GCControllerDidConnectNotification object:nil];
     [center addObserver:self selector:@selector(controllerDidDisconnect:) name:GCControllerDidDisconnectNotification object:nil];
-    
+
     initialTimeMillis = CACurrentMediaTime() * 1000.0;
 }
 
@@ -375,19 +367,19 @@
     NSNotificationCenter* center = [NSNotificationCenter defaultCenter];
     [center removeObserver:self name:GCControllerDidConnectNotification object:nil];
     [center removeObserver:self name:GCControllerDidDisconnectNotification object:nil];
-    
+
     // Remove all the gamepads
     [self->gamepads removeAllObjects];
-    
+
     // Remove the gamepad argument
     [argument removeObjectForKey:GAMEPAD];
-    
+
     if (gamepadConnectedCommand)
     {
         [gamepadDisconnectedCommand release];
         gamepadDisconnectedCommand = nil;
     }
-    
+
     if (gamepadDisconnectedCommand)
     {
         [gamepadDisconnectedCommand release];
@@ -398,9 +390,9 @@
 - (void)getGamepads:(CDVInvokedUrlCommand*)command
 {
     CDVPluginResult* pluginResult = nil;
-    
+
     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:gamepads];
-    
+
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
