@@ -22,7 +22,7 @@
     xmlns:rim="http://www.blackberry.com/ns/widgets"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.judax.cordova.plugin.gamepad"
-    version="1.0.0">
+    version="1.1.0">
 
     <name>Gamepad</name>
     <description>Cordova Gamepad Plugin</description>
@@ -63,7 +63,7 @@
 
         <framework src="GameController.framework" weak="true" />
         <framework src="QuartzCore.framework" weak="true" />
-        
+
     </platform>
 
 </plugin>
