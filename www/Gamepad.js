@@ -10,7 +10,7 @@ var cordova = require('cordova');
         if (navigator.getGamepads) return;
 
         /*
-        This data has been added because in Construct2 (www.scirra.com) the data taken from the native gamepads is being modified 
+        This data has been added because in Construct2 (www.scirra.com) the data taken from the native gamepads is being modified
         adding some attributes to it. Cordova is returning a new data structure in everycall (that is just how JS to Native bindings work)
         so the following array (gamepads) will contain up to date copies of the native gamepad structures.
         As this functionality adds some extra overhead (copies per call), you can disable it by just setting USE_MERGE to false.
@@ -54,10 +54,10 @@ var cordova = require('cordova');
                 copy = from[prop];
                 if(type(copy) == 'object') {
                     target[prop] = merge((type(target[prop]) == 'object' ? target[prop] : {}), copy);
-                } 
+                }
                 else if(type(copy) == 'array') {
                     target[prop] = merge((type(target[prop]) == 'array' ? target[prop] : []), copy);
-                } 
+                }
                 else {
                     target[prop] = copy;
                 }
@@ -111,6 +111,17 @@ var cordova = require('cordova');
                                 gamepads.push(gamepad);
                             }
                         }
+                    }
+
+                    // Adjust to latest Gamepad API spec.
+                    for (i = 0; i < gamepads.length; i++) {
+                      gamepad = gamepads[i];
+                      for (j = 0; j < gamepad.buttons.length; j++) {
+                        var button = {};
+                        button.value = gamepad.buttons[j];
+                        button.pressed = button.value > 0.0;
+                        gamepad.buttons[j] = button;
+                      }
                     }
                     return gamepads;
                 }
@@ -200,14 +211,14 @@ var cordova = require('cordova');
         window.removeEventListener = function(eventName, callback) {
             if (eventName === 'gamepadconnected') {
                 removeCallback(cordova.gamepad.listeners.connected, callback);
-            } 
+            }
             else if (eventName === 'gamepaddisconnected') {
                 removeCallback(cordova.gamepad.listeners.disconnected, callback);
             }
             else {
                 return cordova.gamepad.oldWindowRemoveEventListener.apply(this, Array.prototype.slice.call(arguments));
             }
-        };   
+        };
     }
 
     // Wait for Cordova to be ready in order to start the plugin
