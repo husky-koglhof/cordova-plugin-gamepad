@@ -12,7 +12,6 @@
     CDVInvokedUrlCommand* gamepadDisconnectedCommand;
 }
 
--(CDVPlugin*)initWithWebView:(UIWebView*)theWebView;
 -(void)dealloc;
 -(void)pluginInitialize;
 -(void)dispose;
