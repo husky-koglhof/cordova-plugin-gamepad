@@ -7,7 +7,8 @@ var cordova = require('cordova');
         // Check if the getGamepads function already exists. If so, just return (and if it uses a prefix, get rid of it)
         navigator.getGamepads = navigator.getGamepads || navigator.webkitGetGamepads || navigator.webkitGamepads;
 
-        if (navigator.getGamepads) return;
+				// Force native cordova implementation
+        //if (navigator.getGamepads) return;
 
         /*
         This data has been added because in Construct2 (www.scirra.com) the data taken from the native gamepads is being modified
