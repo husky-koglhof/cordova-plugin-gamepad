@@ -12,7 +12,7 @@ This plugin has been published in the Cordova Plugin Registry (Plugman) so addin
 2. Create a Cordova project and add the desired platforms (remember that this plugin works for iOS and Android for now only): https://cordova.apache.org/docs/en/3.0.0/guide_cli_index.md.html
 3. Install the plugin with the following command line:
 
-	`cordova plugin add com.judax.cordova.plugin.gamepad`
+	`cordova plugin add (https://github.com/TecenGOD/cordova-plugin-gamepad.git)`
 
 ###Modifications in your application
 
