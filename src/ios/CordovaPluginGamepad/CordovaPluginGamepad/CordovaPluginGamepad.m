@@ -30,6 +30,9 @@
 #define BUTTON_LEFT_TRIGGER_INDEX 6
 #define BUTTON_RIGHT_TRIGGER_INDEX 7
 
+#define BUTTON_8_INDEX 8
+#define BUTTON_9_INDEX 9
+
 //		KEY_CODE_TO_BUTTON_INDEX_MAP.put(SELECT/BACK, 8);
 //		KEY_CODE_TO_BUTTON_INDEX_MAP.put(START/FORWARD, 9);
 
@@ -91,6 +94,14 @@
                 else if (element == data.buttonY)
                 {
                     buttons[BUTTON_3_INDEX] = [NSNumber numberWithFloat:data.buttonY.value];
+                }
+                else if (element == data.buttonOptions)
+                {
+                    buttons[BUTTON_8_INDEX] = [NSNumber numberWithFloat:data.buttonOptions.value];
+                }
+                else if (element == data.buttonMenu)
+                {
+                    buttons[BUTTON_9_INDEX] = [NSNumber numberWithFloat:data.buttonMenu.value];
                 }
                 else if (element == data.leftShoulder)
                 {
