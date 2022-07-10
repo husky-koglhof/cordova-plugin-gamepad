@@ -77,7 +77,7 @@ var cordova = require('cordova');
             // This is the Cordova success callback.
             function success(nativeGamepads) {
                 // If the merge flag is active, update the gamepads array in the JS side using the nativeGamepads array from the native side.
-                if (USE_MERGE) {
+                if (!USE_MERGE) {
                     if (nativeGamepads.length === 0) {
                             gamepads = [];
                     }
@@ -86,23 +86,8 @@ var cordova = require('cordova');
                         for (i = 0; i < gamepads.length; i++) {
                             gamepad = gamepads[i];
                             nativeGamepad = null;
-                            // Iterate over all the native gamepads
-                            for (j = 0; nativeGamepad === null && j < nativeGamepads.length; j++) {
-                                nativeGamepad = nativeGamepads[j];
-                                if (!nativeGamepad || nativeGamepad.index !== gamepad.index) {
-                                    nativeGamepad = null;
-                                }
-                            }
-                            // If a native gamepad has a counterpart in the JS gamepad, merge them and mark the native gamepad as found
-                            if (nativeGamepad !== null) {
-                                gamepad = merge(gamepad, nativeGamepad);
-                                nativeGamepad.found = true;
-                            }
-                            // If there is no conterpart, remove the JS gamepad
-                            else {
-                                gamepads.splice(i, 1);
-                                i--;
-                            }
+                            
+                            
                         }
                         // All the native gamepads that were not found must be added to the JS gamepads array
                         for (i = 0; i < nativeGamepads.length; i++) {
@@ -110,6 +95,7 @@ var cordova = require('cordova');
                             if (!nativeGamepad.found) {
                                 gamepad = merge({}, nativeGamepad);
                                 gamepads.push(gamepad);
+                                
                             }
                         }
                     }
@@ -124,11 +110,21 @@ var cordova = require('cordova');
                         gamepad.buttons[j] = button;
                       }
                     }
+                    
                     return gamepads;
                 }
                 // As the merge flag was not active, the native gamepads are returned.
                 else {
                     gamepads = nativeGamepads;
+                    for (i = 0; i < gamepads.length; i++) {
+                      gamepad = gamepads[i];
+                      for (j = 0; j < gamepad.buttons.length; j++) {
+                        var button = {};
+                        button.value = gamepad.buttons[j];
+                        button.pressed = button.value > 0.0;
+                        gamepad.buttons[j] = button;
+                      }
+                    }
                 }
             }
 
