@@ -255,8 +255,8 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 			refreshGamepads();
 			initialTimeMillis = System.currentTimeMillis();
 
-			webView.OnGenericMotionListener(this);
-			webView.OnKeyListener(this);
+			// webView.OnGenericMotionListener(this);
+			// webView.OnKeyListener(this);
 
 			cordova.getActivity().runOnUiThread(new Runnable()
 			{
@@ -280,8 +280,8 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 	@Override
 	public void onDestroy()
 	{
-		this.webView.OnGenericMotionListener(null);
-		this.webView.OnKeyListener(null);
+		// this.webView.OnGenericMotionListener(null);
+		// this.webView.OnKeyListener(null);
 
 		usedIndices = null;
 		buttonsToJustProcessActionDown = null;
