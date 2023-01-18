@@ -255,8 +255,8 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 			refreshGamepads();
 			initialTimeMillis = System.currentTimeMillis();
 
-			super.OnGenericMotionListener(this);
-			super.OnKeyListener(this);
+			setOnGenericMotionListener(this);
+			setOnKeyListener(this);
 
 			cordova.getActivity().runOnUiThread(new Runnable()
 			{
