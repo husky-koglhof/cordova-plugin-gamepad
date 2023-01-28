@@ -535,6 +535,7 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 	@TargetApi(12)
 	public boolean onGenericMotion(View v, MotionEvent event)
 	{
+		System.out.println("onGenericMotion called");
 		boolean processed = false;
 		try
 		{
@@ -612,6 +613,7 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 	@TargetApi(9)
 	public boolean onKey(View v, int keyCode, KeyEvent event)
 	{
+	        System.out.println("onKey called");
 		boolean processed = false;
 		try
 		{
