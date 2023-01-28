@@ -17,7 +17,7 @@
        under the License.
  */
 
-package <%PACKAGE_NAME%>;
+package com.huskykoglhof.sbrick_configurator_debug;
 
 import android.os.Bundle;
 import android.view.KeyEvent;
