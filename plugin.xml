@@ -47,7 +47,7 @@
             </feature>
         </config-file>
 
-        <hook type="after_prepare" src="hooks/android/override_activity.js" />
+        <hook type="after_compile" src="hooks/android/override_activity.js" />
 
         <source-file src="src/android/src/com/judax/cordova/plugin/gamepad/CordovaPluginGamepad.java" target-dir="com/judax/cordova/plugin/gamepad" />
     </platform>
