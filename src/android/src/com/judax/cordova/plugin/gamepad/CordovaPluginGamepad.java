@@ -22,6 +22,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnGenericMotionListener;
 import android.view.View.OnKeyListener;
+import android.webkit.WebView;
 
 @SuppressLint("NewApi")
 public class CordovaPluginGamepad extends CordovaPlugin implements
@@ -94,6 +95,7 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 	private CallbackContext gamepadConnectedCallbackContext = null;
 	private CallbackContext gamepadDisconnectedCallbackContext = null;
 
+    private View myView;
 	class ButtonToJustProcessActionDown
 	{
 		private int gamepadIndex;
@@ -290,7 +292,7 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 			refreshGamepads();
 			initialTimeMillis = System.currentTimeMillis();
 
-			View myView = webView.getView();
+			myView = webView.getView();
 			myView.setOnKeyListener(this);
 			myView.setOnGenericMotionListener(this);
 
@@ -314,8 +316,8 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 	@Override
 	public void onDestroy()
 	{
-		// this.webView.OnGenericMotionListener(null);
-		// this.webView.OnKeyListener(null);
+        myView.setOnKeyListener(this);
+        myView.setOnGenericMotionListener(this);
 
 		usedIndices = null;
 		buttonsToJustProcessActionDown = null;
@@ -646,125 +648,53 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 	@TargetApi(9)
 	public boolean onKey(View v, int keyCode, KeyEvent event)
 	{
-	        System.out.println("onKey called");
+        System.out.println("onKey called");
 		boolean processed = false;
-		try
-		{
+		try {
 			InputDevice inputDevice = event.getDevice();
-			if (inputDevice != null)
-			{
+			if (inputDevice != null) {
 				JSONObject gamepad = findGamepad(inputDevice.getId());
-				if (gamepad != null)
-				{
+				if (gamepad != null) {
 					JSONArray gamepadButtons = gamepad.getJSONArray(BUTTONS);
 
-					// for (Integer keyCodeToJustProcessActionDown:
-					// KEY_CODES_TO_JUST_PROCESS_ACTION_DOWN)
-					// {
-					// Integer buttonIndex =
-					// KEY_CODE_TO_BUTTON_INDEX_MAP.get(keyCodeToJustProcessActionDown);
-					// if (buttonIndex != null && gamepadButtons[buttonIndex].equals(ONE))
-					// {
-					// gamepadButtons[buttonIndex] = ZERO;
-					// }
-					// }
-
 					boolean down = event.getAction() == KeyEvent.ACTION_DOWN;
-					boolean keyCodeToJustProcessActionDown = KEY_CODES_TO_JUST_PROCESS_ACTION_DOWN
-							.contains(keyCode);
+					boolean keyCodeToJustProcessActionDown = KEY_CODES_TO_JUST_PROCESS_ACTION_DOWN.contains(keyCode);
 
 					Integer buttonIndex = KEY_CODE_TO_BUTTON_INDEX_MAP.get(keyCode);
-					if (buttonIndex != null)
-					{
-
-						// HACK: It seems that the controller dpad reading in a regular
-						// Android
-						// device and the OUYA are different.
-						// OUYA: The events are sent as onKey events.
-						// Android: The events are sent as onGenericMortion events.
-						// (event.getSource() & InputDevice.SOURCE_DPAD) != 0 should have
-						// been
-						// valid in order to identify if the source
-						// was the dpad and do not take motion events into account when
-						// handling
-						// the dpad. But it seems that we cannot find
-						// a way to handle this correctly so these internal flag has been
-						// added
-						// to identify if the dpad is handled using
-						// onKey events or if they should be handled using onGenericMotion
-						// events.
-						if (!dpadHandledByOnKeyEvent)
-						{
-							dpadHandledByOnKeyEvent = buttonIndex.intValue() == BUTTON_INDEX_DPAD_UP
-									|| buttonIndex.intValue() == BUTTON_INDEX_DPAD_DOWN
-									|| buttonIndex.intValue() == BUTTON_INDEX_DPAD_LEFT
-									|| buttonIndex.intValue() == BUTTON_INDEX_DPAD_RIGHT;
+					if (buttonIndex != null) {
+						if (!dpadHandledByOnKeyEvent) {
+							dpadHandledByOnKeyEvent =
+                                buttonIndex.intValue() == BUTTON_INDEX_DPAD_UP ||
+                                buttonIndex.intValue() == BUTTON_INDEX_DPAD_DOWN  ||
+                                buttonIndex.intValue() == BUTTON_INDEX_DPAD_LEFT ||
+                                buttonIndex.intValue() == BUTTON_INDEX_DPAD_RIGHT;
 						}
 
-						// System.out.println("button index '" + buttonIndex +
-						// "' found for keyCode '" + keyCode + "' and is action " + (down ?
-						// "DOWN" : "UP") + ".");
-
-						if (down)
-						{
-							// Only notify the down if it is the first time (not the
-							// repetitions)
-							if (event.getRepeatCount() == 0)
-							{
+						if (down) {
+							if (event.getRepeatCount() == 0) {
 								gamepadButtons.put((int) buttonIndex, ONE);
 
-								if (keyCodeToJustProcessActionDown)
-								{
-									// This button is special as it only is ONE-d and not ZERO-ed.
-									// In order to get it to ZERO again,
-									// an entry to the buttonsToJustProcessActionDown is
-									// generated. This structure holds all the buttons
-									// that should be marked as ZERO but as they are handled only
-									// on action down, they need to be shown
-									// to the developer/app at least once. It is determined that
-									// this happens when at least one getGamepads
-									// call has been made. That is where the
-									// ButtonToJustProcessActionDown class comes into play, to
-									// store
-									// the status of the button regarding the getGamepads call.
-									// Actually, if there was already one, just mark the
-									// getGamepadsCalled flag back to false (for the strange case
-									// where the
-									// button was activated, the a getGamepads was called (so the
-									// next time it should be ZERO-ed) but then a new press
-									// is specified.
-									ButtonToJustProcessActionDown buttonToJustProcessActionDown = new ButtonToJustProcessActionDown(
-											(int) (long) (Long) gamepad.get(INDEX), buttonIndex);
-									int indexOfButton = buttonsToJustProcessActionDown
-											.indexOf(buttonToJustProcessActionDown);
-									if (indexOfButton >= 0)
-									{
-										buttonToJustProcessActionDown = buttonsToJustProcessActionDown
-												.get(indexOfButton);
+								if (keyCodeToJustProcessActionDown) {
+									ButtonToJustProcessActionDown buttonToJustProcessActionDown = new ButtonToJustProcessActionDown((int) (long) (Long) gamepad.get(INDEX), buttonIndex);
+									int indexOfButton = buttonsToJustProcessActionDown.indexOf(buttonToJustProcessActionDown);
+									if (indexOfButton >= 0) {
+										buttonToJustProcessActionDown = buttonsToJustProcessActionDown.get(indexOfButton);
 										buttonToJustProcessActionDown.setGetGamepadsCalled(false);
-									}
-									else
-									{
-										buttonsToJustProcessActionDown
-												.add(buttonToJustProcessActionDown);
+									} else {
+										buttonsToJustProcessActionDown.add(buttonToJustProcessActionDown);
 									}
 								}
 							}
-						}
-						else if (!keyCodeToJustProcessActionDown)
-						{
+						} else if (!keyCodeToJustProcessActionDown) {
 							gamepadButtons.put((int) buttonIndex, ZERO);
 						}
 						processed = true;
 					}
-
-					gamepad.put(TIME_STAMP, System.currentTimeMillis()
-							- initialTimeMillis);
+					gamepad.put(TIME_STAMP, System.currentTimeMillis() - initialTimeMillis);
+                    System.out.println(gamepad);
 				}
 			}
-		}
-		catch (JSONException e)
-		{
+		} catch (JSONException e) {
 			// TODO: Notify an error
 			throw new RuntimeException(e);
 		}
