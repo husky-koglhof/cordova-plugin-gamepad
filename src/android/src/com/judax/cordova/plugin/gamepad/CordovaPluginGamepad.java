@@ -240,6 +240,41 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 		}
 	}
 
+    public boolean useEventKey(KeyEvent event) {
+        System.out.println("useEventKey: " +event.getKeyCode() + " = " + event.getAction());
+        // ACTION_UP 1
+        // ACTION_DOWN 0
+        switch (event.getKeyCode()) {
+            case KeyEvent.KEYCODE_BUTTON_L1:
+                System.out.println("Button L1");
+                return true;
+            case KeyEvent.KEYCODE_BUTTON_R1:
+                System.out.println("Button R1");
+                return true;
+            case KeyEvent.KEYCODE_BUTTON_THUMBL:
+                System.out.println("Button Thumb Left");
+                return true;
+            case KeyEvent.KEYCODE_BUTTON_THUMBR:
+                System.out.println("Button Thumb Right");
+                return true;
+            case KeyEvent.KEYCODE_BUTTON_Y:  // Up
+                System.out.println("Button Y (Up)");
+                return true;
+            case KeyEvent.KEYCODE_BUTTON_B:  // Right
+                return true;
+            case KeyEvent.KEYCODE_BACK:
+                System.out.println("Button B (Right)");
+                return true;
+            case KeyEvent.KEYCODE_BUTTON_A:  // Down
+                System.out.println("Button A (Down)");
+                return true;
+            case KeyEvent.KEYCODE_BUTTON_X:  // Left
+                System.out.println("Button X (Left)");
+                return true;
+            default:
+                return false;
+        }
+    }
 	@Override
 	public void initialize(final CordovaInterface cordova, CordovaWebView webView)
 	{
@@ -259,15 +294,13 @@ public class CordovaPluginGamepad extends CordovaPlugin implements
 			myView.setOnKeyListener(this);
 			myView.setOnGenericMotionListener(this);
 
-			cordova.getActivity().runOnUiThread(new Runnable()
+            cordova.getActivity().runOnUiThread(new Runnable()
 			{
 				@Override
 				public void run()
 				{
-					InputManager inputManager = (InputManager) cordova.getActivity()
-							.getSystemService(Context.INPUT_SERVICE);
-					inputManager.registerInputDeviceListener(CordovaPluginGamepad.this,
-							null);
+                    InputManager inputManager = (InputManager) cordova.getActivity().getSystemService(Context.INPUT_SERVICE);
+					inputManager.registerInputDeviceListener(CordovaPluginGamepad.this, null);
 				}
 			});
 		}
